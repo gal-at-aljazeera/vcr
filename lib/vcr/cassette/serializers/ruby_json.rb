@@ -1,19 +1,15 @@
-require 'multi_json'
+require 'json'
 
 module VCR
   class Cassette
     class Serializers
-      # The JSON serializer. Uses `MultiJson` under the covers.
-      #
       # @see Psych
       # @see Syck
       # @see YAML
-      module JSON
+      module RUBY_JSON
         extend self
         extend EncodingErrorHandling
-
-        # @private
-        ENCODING_ERRORS = [MultiJson::DecodeError, ArgumentError]
+        ENCODING_ERRORS = [JSON::ParserError, ArgumentError]
         ENCODING_ERRORS << EncodingError if defined?(EncodingError)
 
         # The file extension to use for this serializer.
@@ -29,7 +25,7 @@ module VCR
         # @return [String] the JSON string
         def serialize(hash)
           handle_encoding_errors do
-            MultiJson.encode(hash)
+            JSON.generate(hash)
           end
         end
 
@@ -39,7 +35,7 @@ module VCR
         # @return [Hash] the deserialized object
         def deserialize(string)
           handle_encoding_errors do
-            MultiJson.decode(string)
+            JSON.parse(string)
           end
         end
       end
